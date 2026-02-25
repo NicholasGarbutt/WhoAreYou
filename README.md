@@ -1,4 +1,4 @@
-# WhoAreYou 👤🔍
+# WhoAreYou 👤🔍 Python 3.10
 
 **WhoAreYou** is a Python-based facial recognition tool that uses a user’s webcam to identify people in real time. The project aims to improve everyday facial recognition by checking whether someone is known personally (from a private photo collection) or has an online presence.
 
