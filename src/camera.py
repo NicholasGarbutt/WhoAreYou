@@ -1,13 +1,10 @@
 import cv2
-import face_recognition
-
+from recognition import load_known_faces, recognize_faces
 
 def run_camera():
-    # Open webcam (0 = default camera)
+    known_encodings, known_names = load_known_faces()
+
     video_capture = cv2.VideoCapture(0)
-    video_capture.set(cv2.CAP_PROP_FPS,60)
-    video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, 192)
-    video_capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 144)
 
     if not video_capture.isOpened():
         print("Error: Could not open webcam.")
@@ -16,28 +13,43 @@ def run_camera():
     print("Camera started. Press 'q' to quit.")
 
     while True:
-        # Grab frame
         ret, frame = video_capture.read()
         if not ret:
             break
 
-        # Convert BGR → RGB (face_recognition expects RGB)
-        rgb_frame = frame[:, :, ::-1]
+        results = recognize_faces(frame, known_encodings, known_names)
 
-        # Detect faces
-        face_locations = face_recognition.face_locations(rgb_frame)
+        for (top, right, bottom, left), name, confidence in results:
 
-        # Draw boxes
-        for (top, right, bottom, left) in face_locations:
+            # Draw rectangle around face
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
 
-        # Show frame
-        cv2.imshow("WhoAreYou - Face Detection", frame)
+            label = f"{name} ({confidence}%)"
 
-        # Quit on 'q'
+            # Draw filled label background
+            cv2.rectangle(
+                frame,
+                (left, top - 35),
+                (right, top),
+                (0, 255, 0),
+                cv2.FILLED
+            )
+
+            # Put text above face
+            cv2.putText(
+                frame,
+                label,
+                (left + 6, top - 8),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.6,
+                (0, 0, 0),
+                2
+            )
+
+        cv2.imshow("WhoAreYou - Face Recognition", frame)
+
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
 
-    # Cleanup
     video_capture.release()
     cv2.destroyAllWindows()
