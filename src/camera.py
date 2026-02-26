@@ -6,7 +6,7 @@ import face_recognition
 from recognition import load_known_faces, recognize_faces
 
 PROFILES_PATH = "/Users/nicholas/Desktop/WhoAreYou/src/profiles.json"
-FACES_DIR = "known_faces"
+FACES_DIR = "/Users/nicholas/Desktop/WhoAreYou/known_faces"
 
 def run_camera():
     known_encodings, known_names = load_known_faces()
@@ -153,9 +153,32 @@ def run_camera():
                     file_path = f"{person_folder}/{image_count}.jpg"
 
                     cv2.imwrite(file_path, face_image_resized)
+       
+        elif key == ord("p") and confidence >= 40 and name != "Unknown":
+            name = input("Name: ").strip()
+            if name == "":
+                continue
+            if name == "quit":
+                break
 
+            met_at = input("Where did you meet them? ").strip()
+            job = input("What do they do for work? ").strip()
+            who = input("Who are they to you? ").strip()
+            DOB = input("Date of Birth (DD/MM/YYYY): ").strip()
+           
+            profiles[name] = {
+                    "met_at": met_at,
+                    "job": job,
+                    "who": who,
+                    "DOB": DOB
+                }
+
+            with open(PROFILES_PATH, "w") as f:
+                json.dump(profiles, f, indent=4)
+
+            
         elif key == ord("q"):
-            break
+            break         
 
     video_capture.release()
     cv2.destroyAllWindows()

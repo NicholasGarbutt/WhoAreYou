@@ -7,7 +7,7 @@ def load_known_faces():
     known_encodings = []
     known_names = []
 
-    base_path = "known_faces"
+    base_path = "/Users/nicholas/Desktop/WhoAreYou/known_faces"
 
     for person_name in os.listdir(base_path):
         person_folder = os.path.join(base_path, person_name)
@@ -26,7 +26,7 @@ def load_known_faces():
                         known_encodings.append(encodings[0])
                         known_names.append(person_name)
 
-    print(f"Loaded {len(known_encodings)} total face encodings.")
+    print(f"Loaded {len(known_encodings)} total faces.")
     return known_encodings, known_names
 
 def recognize_faces(frame, known_encodings, known_names):
@@ -44,7 +44,7 @@ def recognize_faces(frame, known_encodings, known_names):
         matches = face_recognition.compare_faces(known_encodings, face_encoding)
         face_distances = face_recognition.face_distance(known_encodings, face_encoding)
 
-        name = "Unknown"
+        name = "????"
         confidence = 0
 
         if len(face_distances) > 0:

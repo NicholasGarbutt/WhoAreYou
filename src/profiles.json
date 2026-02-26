@@ -1,14 +1,14 @@
 {
-    "Nick": {
-        "met_at": "Birth",
-        "job": "Student/Big W",
-        "who": "Is you stupid",
-        "DOB": "08/04/2005"
-    },
-    "Rhi":{
+    "Rhi": {
         "met_at": "Primary School",
         "job": "Student/Maccas",
         "who": "Pretty Girlfriend",
         "DOB": "01/02/2005"
+    },
+    "Nick": {
+        "met_at": "Birth",
+        "job": "Big W",
+        "who": "You",
+        "DOB": "08/04/2005"
     }
 }
