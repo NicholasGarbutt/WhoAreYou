@@ -20,6 +20,7 @@ def run_camera():
     video_capture = cv2.VideoCapture(0)
 
     if not video_capture.isOpened():
+        print("Camera failed to open.")
         return
 
     while True:
@@ -29,18 +30,20 @@ def run_camera():
 
         results = recognize_faces(frame, known_encodings, known_names)
 
+        detected_name = None
+        detected_confidence = 0
+        detected_location = None
+
         for (top, right, bottom, left), name, confidence in results:
+            detected_name = name
+            detected_confidence = confidence
+            detected_location = (top, right, bottom, left)
+
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
 
             label = f"{name} ({confidence}%)"
 
-            cv2.rectangle(
-                frame,
-                (left, top - 35),
-                (right, top),
-                (0, 255, 0),
-                cv2.FILLED
-            )
+            cv2.rectangle(frame, (left, top - 35), (right, top), (0, 255, 0), cv2.FILLED)
 
             cv2.putText(
                 frame,
@@ -76,14 +79,8 @@ def run_camera():
 
         key = cv2.waitKey(1) & 0xFF
 
-        if key == ord("n") and confidence <= 40:
-            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            face_locations = face_recognition.face_locations(rgb_frame)
-
-            if len(face_locations) == 0:
-                continue
-
-            top, right, bottom, left = face_locations[0]
+        if key == ord("n") and detected_name == "Unknown" and detected_location:
+            top, right, bottom, left = detected_location
 
             face_height = bottom - top
             padding = int(face_height * 0.4)
@@ -97,10 +94,8 @@ def run_camera():
             face_image_resized = cv2.resize(face_image, (200, 200))
 
             name = input("Name: ").strip()
-            if name == "":
+            if name == "" or name.lower() == "quit":
                 continue
-            if name == "quit":
-                break
 
             met_at = input("Where did you meet them? ").strip()
             job = input("What do they do for work? ").strip()
@@ -132,53 +127,56 @@ def run_camera():
                 with open(PROFILES_PATH, "w") as f:
                     json.dump(profiles, f, indent=4)
 
-        elif key == ord("a"):
-            for (top, right, bottom, left), name, confidence in results:
-                if name != "Unknown" and confidence > 30:
-                    face_height = bottom - top
-                    padding = int(face_height * 0.4)
+        elif key == ord("a") and detected_name and detected_name != "Unknown" and detected_location:
+            top, right, bottom, left = detected_location
 
-                    top_p = max(0, top - padding)
-                    bottom_p = min(frame.shape[0], bottom + padding)
-                    left_p = max(0, left - padding)
-                    right_p = min(frame.shape[1], right + padding)
+            face_height = bottom - top
+            padding = int(face_height * 0.4)
 
-                    face_image = frame[top_p:bottom_p, left_p:right_p]
-                    face_image_resized = cv2.resize(face_image, (200, 200))
+            top_p = max(0, top - padding)
+            bottom_p = min(frame.shape[0], bottom + padding)
+            left_p = max(0, left - padding)
+            right_p = min(frame.shape[1], right + padding)
 
-                    person_folder = f"{FACES_DIR}/{name}"
-                    os.makedirs(person_folder, exist_ok=True)
+            face_image = frame[top_p:bottom_p, left_p:right_p]
+            face_image_resized = cv2.resize(face_image, (200, 200))
 
-                    image_count = len(os.listdir(person_folder)) + 1
-                    file_path = f"{person_folder}/{image_count}.jpg"
+            person_folder = f"{FACES_DIR}/{detected_name}"
+            os.makedirs(person_folder, exist_ok=True)
 
-                    cv2.imwrite(file_path, face_image_resized)
-       
-        elif key == ord("p") and confidence >= 40 and name != "Unknown":
-            name = input("Name: ").strip()
-            if name == "":
-                continue
-            if name == "quit":
-                break
+            image_count = len(os.listdir(person_folder)) + 1
+            file_path = f"{person_folder}/{image_count}.jpg"
+
+            cv2.imwrite(file_path, face_image_resized)
+
+        elif key == ord("p") and detected_name and detected_name != "Unknown":
+
+            if detected_name in profiles:
+                confirm = input(f"{detected_name} already exists. Overwrite? (y/n): ").strip().lower()
+                if confirm != "y":
+                    continue
 
             met_at = input("Where did you meet them? ").strip()
             job = input("What do they do for work? ").strip()
             who = input("Who are they to you? ").strip()
             DOB = input("Date of Birth (DD/MM/YYYY): ").strip()
-           
-            profiles[name] = {
-                    "met_at": met_at,
-                    "job": job,
-                    "who": who,
-                    "DOB": DOB
-                }
+
+            profiles[detected_name] = {
+                "met_at": met_at,
+                "job": job,
+                "who": who,
+                "DOB": DOB
+            }
 
             with open(PROFILES_PATH, "w") as f:
                 json.dump(profiles, f, indent=4)
 
-            
         elif key == ord("q"):
-            break         
+            break
 
     video_capture.release()
     cv2.destroyAllWindows()
+
+
+if __name__ == "__main__":
+    run_camera()
