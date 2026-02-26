@@ -76,7 +76,7 @@ def run_camera():
 
         key = cv2.waitKey(1) & 0xFF
 
-        if key == ord("n"):
+        if key == ord("n") and confidence <= 40:
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             face_locations = face_recognition.face_locations(rgb_frame)
 
@@ -94,11 +94,13 @@ def run_camera():
             right = min(frame.shape[1], right + padding)
 
             face_image = frame[top:bottom, left:right]
-            face_image_resized = cv2.resize(face_image, (300, 300))
+            # face_image_resized = cv2.resize(face_image, (300, 300))
 
             name = input("Name: ").strip()
             if name == "":
                 continue
+            if name == "quit":
+                break
 
             met_at = input("Where did you meet them? ").strip()
             job = input("What do they do for work? ").strip()
@@ -129,6 +131,28 @@ def run_camera():
 
                 with open(PROFILES_PATH, "w") as f:
                     json.dump(profiles, f, indent=4)
+
+        elif key == ord("a"):
+            for (top, right, bottom, left), name, confidence in results:
+                if name != "Unknown" and confidence > 50:
+                    face_height = bottom - top
+                    padding = int(face_height * 0.4)
+
+                    top_p = max(0, top - padding)
+                    bottom_p = min(frame.shape[0], bottom + padding)
+                    left_p = max(0, left - padding)
+                    right_p = min(frame.shape[1], right + padding)
+
+                    face_image = frame[top_p:bottom_p, left_p:right_p]
+                    # face_image_resized = cv2.resize(face_image, (300, 300))
+
+                    person_folder = f"{FACES_DIR}/{name}"
+                    os.makedirs(person_folder, exist_ok=True)
+
+                    image_count = len(os.listdir(person_folder)) + 1
+                    file_path = f"{person_folder}/{image_count}.jpg"
+
+                    cv2.imwrite(file_path, face_image_resized)
 
         elif key == ord("q"):
             break
