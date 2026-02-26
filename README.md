@@ -43,19 +43,17 @@
 
 ## Phase 1 — Core Functionality
 
-- [ ] Basic webcam face detection  
-- [ ] Local face database matching  
-- [ ] Real-time bounding boxes  
-- [ ] Confidence scoring  
+- [x] Basic webcam face detection  
+- [x] Local face database matching  
+- [x] Real-time bounding boxes  
+- [x] Confidence scoring  
 
 ---
 
 ## Phase 2 — Accuracy Improvements
 
-- [ ] Better face encoding pipeline  
-- [ ] Multi-image per person support  
-- [ ] Adjustable tolerance threshold  
-- [ ] Performance optimisations  
+- [x] Multi-image per person support  
+- [x] Performance optimisations  
 
 ---
 
@@ -71,6 +69,6 @@
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/WhoAreYou.git
+git clone https://github.com/NicholasGarbutt/WhoAreYou
 cd WhoAreYou
 

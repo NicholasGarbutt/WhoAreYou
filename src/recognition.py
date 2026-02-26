@@ -7,26 +7,31 @@ def load_known_faces():
     known_encodings = []
     known_names = []
 
-    for filename in os.listdir("known_faces"):
-        if filename.endswith((".jpg", ".png", ".jpeg")):
-            image_path = os.path.join("known_faces", filename)
-            image = face_recognition.load_image_file(image_path)
+    base_path = "known_faces"
 
-            encodings = face_recognition.face_encodings(image)
+    for person_name in os.listdir(base_path):
+        person_folder = os.path.join(base_path, person_name)
 
-            if len(encodings) > 0:
-                known_encodings.append(encodings[0])
-                name = os.path.splitext(filename)[0]
-                known_names.append(name)
+        if os.path.isdir(person_folder):
 
+            for filename in os.listdir(person_folder):
+                if filename.endswith((".jpg", ".png", ".jpeg")):
+
+                    image_path = os.path.join(person_folder, filename)
+                    image = face_recognition.load_image_file(image_path)
+
+                    encodings = face_recognition.face_encodings(image)
+
+                    if len(encodings) > 0:
+                        known_encodings.append(encodings[0])
+                        known_names.append(person_name)
+
+    print(f"Loaded {len(known_encodings)} total face encodings.")
     return known_encodings, known_names
 
-
 def recognize_faces(frame, known_encodings, known_names):
-    # 🔥 Resize frame to 25% for speed
     small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
 
-    # Convert BGR → RGB
     rgb_small = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
 
     face_locations = face_recognition.face_locations(rgb_small)
@@ -49,7 +54,7 @@ def recognize_faces(frame, known_encodings, known_names):
                 name = known_names[best_match_index]
                 distance = face_distances[best_match_index]
 
-                # Convert distance to confidence %
+
                 confidence = round((1 - distance) * 100, 2)
 
         # Scale face location back up
