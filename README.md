@@ -66,9 +66,7 @@
 
 ## 📦 Installation
 
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/NicholasGarbutt/WhoAreYou
-cd WhoAreYou
-
+## How to use 
+- n = add a new person 
+- a = add image for existing person 
+- p = add description or overide for person 
