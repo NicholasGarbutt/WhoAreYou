@@ -1,5 +1,6 @@
+# Files that should be private
 /known_faces/
-
+/profiles.json/
 # Virtual environments
 .face_env/
 venv/

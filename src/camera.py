@@ -47,7 +47,7 @@ def run_camera():
                 label,
                 (left + 6, top - 8),
                 cv2.FONT_HERSHEY_SIMPLEX,
-                0.6,
+                1,
                 (0, 0, 0),
                 2
             )
@@ -63,13 +63,13 @@ def run_camera():
                 cv2.putText(frame, f"Met at: {met_at}", (left, y_offset),
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 1)
 
-                cv2.putText(frame, job, (left, y_offset + 20),
+                cv2.putText(frame, job, (left, y_offset + 25),
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 1)
 
-                cv2.putText(frame, who, (left, y_offset + 40),
+                cv2.putText(frame, who, (left, y_offset + 45),
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 1)
 
-                cv2.putText(frame, DOB, (left, y_offset + 60),
+                cv2.putText(frame, DOB, (left, y_offset + 65),
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 1)
 
         cv2.imshow("WhoAreYou - AI Memory Assistant", frame)
@@ -94,7 +94,7 @@ def run_camera():
             right = min(frame.shape[1], right + padding)
 
             face_image = frame[top:bottom, left:right]
-            # face_image_resized = cv2.resize(face_image, (300, 300))
+            face_image_resized = cv2.resize(face_image, (200, 200))
 
             name = input("Name: ").strip()
             if name == "":
@@ -134,7 +134,7 @@ def run_camera():
 
         elif key == ord("a"):
             for (top, right, bottom, left), name, confidence in results:
-                if name != "Unknown" and confidence > 50:
+                if name != "Unknown" and confidence > 30:
                     face_height = bottom - top
                     padding = int(face_height * 0.4)
 
@@ -144,7 +144,7 @@ def run_camera():
                     right_p = min(frame.shape[1], right + padding)
 
                     face_image = frame[top_p:bottom_p, left_p:right_p]
-                    # face_image_resized = cv2.resize(face_image, (300, 300))
+                    face_image_resized = cv2.resize(face_image, (200, 200))
 
                     person_folder = f"{FACES_DIR}/{name}"
                     os.makedirs(person_folder, exist_ok=True)
